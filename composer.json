@@ -1,0 +1,37 @@
+{
+  "name": "rx/child-process",
+  "type": "library",
+  "description": "Library for executing child processes for RxPHP",
+  "keywords": [
+    "child process",
+    "rxphp",
+    "reactivex",
+    "react",
+    "reactphp",
+    "stream",
+    "rx.php"
+  ],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "David Dan",
+      "email": "davidwdan@gmail.com",
+      "role": "Developer"
+    },
+    {
+      "name": "Matt Bonneau",
+      "email": "matt@bonneau.net",
+      "role": "Developer"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Rx\\React\\": "src/"
+    }
+  },
+  "require": {
+    "voryx/event-loop": "^0.2.0",
+    "reactivex/rxphp": "^1.0.0",
+    "react/child-process": "^0.4.0"
+  }
+}
