@@ -6,7 +6,6 @@ use React\ChildProcess\Process;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\Timer\Timer;
 use Rx\Disposable\CallbackDisposable;
-use Rx\Disposable\EmptyDisposable;
 use Rx\ObserverInterface;
 use Rx\Subject\Subject;
 
@@ -46,7 +45,7 @@ class ProcessSubject extends Subject
 
             try {
                 if ($this->process->isRunning()) {
-                    return new EmptyDisposable();
+                    return;
                 }
                 $this->process->start($timer->getLoop());
 
@@ -63,7 +62,7 @@ class ProcessSubject extends Subject
                     parent::onCompleted();
                 });
             } catch (\Exception $e) {
-                $observer->onError($e);
+                parent::onError($e);
             }
         });
 
@@ -71,6 +70,12 @@ class ProcessSubject extends Subject
             $this->removeObserver($observer);
             if (empty($this->observers)) $this->process->terminate();
         });
+    }
+
+    public function dispose()
+    {
+        parent::dispose();
+        $this->process->terminate();
     }
 
     /**
