@@ -6,6 +6,7 @@ use React\ChildProcess\Process;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\Timer\Timer;
 use Rx\Disposable\CallbackDisposable;
+use Rx\Disposable\EmptyDisposable;
 use Rx\ObserverInterface;
 use Rx\Subject\Subject;
 
@@ -39,13 +40,18 @@ class ProcessSubject extends Subject
      */
     public function subscribe(ObserverInterface $observer, $scheduler = null)
     {
+        parent::subscribe($observer, $scheduler);
+
         $this->loop->addTimer(0.001, function (Timer $timer) use ($observer) {
 
             try {
+                if ($this->process->isRunning()) {
+                    return new EmptyDisposable();
+                }
                 $this->process->start($timer->getLoop());
 
-                $this->process->stdout->on('data', function ($output) use ($observer) {
-                    $observer->onNext($output);
+                $this->process->stdout->on('data', function ($output) {
+                    parent::onNext($output);
                 });
 
                 $this->process->stderr->on('data', function ($output) use ($observer) {
@@ -54,16 +60,16 @@ class ProcessSubject extends Subject
                 });
 
                 $this->process->stdout->on('close', function ($output) use ($observer) {
-                    $observer->onCompleted();
+                    parent::onCompleted();
                 });
             } catch (\Exception $e) {
                 $observer->onError($e);
             }
-
         });
 
-        return new CallbackDisposable(function () {
-            $this->process->terminate();
+        return new CallbackDisposable(function () use ($observer) {
+            $this->removeObserver($observer);
+            if (empty($this->observers)) $this->process->terminate();
         });
     }
 
