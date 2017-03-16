@@ -12,13 +12,21 @@ use Rx\Subject\Subject;
 
 class ProcessSubject extends Subject
 {
+    /** @var  Process */
     private $process;
     private $loop;
     private $errorObserver;
+    private $cmd;
+    private $cwd;
+    private $env;
+    private $options;
 
     public function __construct(string $cmd, ObserverInterface $errorObserver = null, string $cwd = null, array $env = null, array $options = [], LoopInterface $loop = null)
     {
-        $this->process       = $process = new Process($cmd, $cwd, $env, $options);
+        $this->cmd           = $cmd;
+        $this->cwd           = $cwd;
+        $this->env           = $env;
+        $this->options       = $options;
         $this->loop          = $loop ?: \EventLoop\getLoop();
         $this->errorObserver = $errorObserver ?: new Subject();
     }
@@ -37,9 +45,16 @@ class ProcessSubject extends Subject
         parent::_subscribe($observer);
 
         try {
-            if ($this->process->isRunning()) {
-                return new EmptyDisposable();
+            if ($this->process && $this->process->isRunning()) {
+                return new CallbackDisposable(function () use ($observer) {
+                    $this->removeObserver($observer);
+                    if (empty($this->observers) && $this->process && $this->process->isRunning()) {
+                        $this->process->terminate();
+                    }
+                });
             }
+
+            $this->process = $process = new Process($this->cmd, $this->cwd, $this->env, $this->options);
             $this->process->start($this->loop);
 
             $this->process->stdout->on('data', function ($output) {
@@ -52,9 +67,11 @@ class ProcessSubject extends Subject
                 }
             });
 
-            $this->process->stdout->on('close', function () use ($observer) {
+            $this->process->stdout->on('close', function () {
                 if (!$this->isDisposed()) {
-                    parent::onCompleted();
+                    foreach ($this->observers as $observer) {
+                        $observer->onCompleted();
+                    }
                 }
             });
         } catch (\Throwable $e) {
@@ -63,7 +80,7 @@ class ProcessSubject extends Subject
 
         return new CallbackDisposable(function () use ($observer) {
             $this->removeObserver($observer);
-            if (empty($this->observers)) {
+            if (empty($this->observers)&& $this->process && $this->process->isRunning()) {
                 $this->process->terminate();
             }
         });
@@ -72,7 +89,7 @@ class ProcessSubject extends Subject
     public function dispose()
     {
         parent::dispose();
-        if ($this->process->isRunning()) {
+        if ($this->process && $this->process->isRunning()) {
             $this->process->terminate();
         }
     }
