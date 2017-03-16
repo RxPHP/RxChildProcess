@@ -6,12 +6,12 @@ $errors = new \Rx\Subject\Subject();
 
 $process = new \Rx\React\ProcessSubject('somebadcommand', $errors);
 
-$process->subscribe(new \Rx\Observer\CallbackObserver(function ($x) {
+$process->subscribe(function ($x) {
     echo $x;
-}));
+});
 
-$errors->subscribe(new \Rx\Observer\CallbackObserver(function (Exception $ex) {
+$errors->subscribe(function (Exception $ex) {
     echo $ex->getMessage();
-}));
+});
 
 //sh: somebadcommand: command not found

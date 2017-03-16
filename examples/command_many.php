@@ -7,6 +7,6 @@ $ls2 = new \Rx\React\ProcessSubject('ls ' . __DIR__ . '/../');
 
 $ls1
     ->merge($ls2)
-    ->subscribe(new \Rx\Observer\CallbackObserver(function ($x) {
+    ->subscribe(function ($x) {
         echo $x;
-    }));
+    });

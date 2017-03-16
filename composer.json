@@ -30,8 +30,17 @@
     }
   },
   "require": {
-    "voryx/event-loop": "^0.2.0",
-    "reactivex/rxphp": "^1.0.0",
-    "react/child-process": "^0.4.0"
+    "voryx/event-loop": "^2.0.0",
+    "react/child-process": "^0.4.3",
+    "reactivex/rxphp": "2.x-dev"
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Rx\\React\\Tests\\": "test/Rx",
+      "Rx\\": "vendor/reactivex/rxphp/test/Rx"
+    },
+    "files": [
+      "vendor/reactivex/rxphp/test/helper-functions.php"
+    ]
   }
 }
