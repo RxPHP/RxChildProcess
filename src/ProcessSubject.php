@@ -5,7 +5,6 @@ namespace Rx\React;
 use React\ChildProcess\Process;
 use React\EventLoop\LoopInterface;
 use Rx\Disposable\CallbackDisposable;
-use Rx\Disposable\EmptyDisposable;
 use Rx\DisposableInterface;
 use Rx\ObserverInterface;
 use Rx\Subject\Subject;
