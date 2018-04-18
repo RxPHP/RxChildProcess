@@ -30,7 +30,7 @@
     }
   },
   "require": {
-    "voryx/event-loop": "^2.0",
+    "voryx/event-loop": "^3.0 || ^2.0",
     "react/child-process": "^0.4.3",
     "reactivex/rxphp": "^2.0"
   },
