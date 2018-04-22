@@ -1,14 +1,27 @@
 language: php
-sudo: required
+sudo: false
 
 php:
   - 7.0
   - 7.1
-  - hhvm
+  - 7.2
 
+## Build matrix for lowest and highest possible targets
 matrix:
-  allow_failures:
-    - php: hhvm
+  include:
+
+    - php: 7.0
+      env: dependencies=lowest
+    - php: 7.1
+      env: dependencies=lowest
+    - php: 7.2
+      env: dependencies=lowest
+    - php: 7.0
+      env: dependencies=highest
+    - php: 7.1
+      env: dependencies=highest
+    - php: 7.2
+      env: dependencies=highest
 
 install:
   - composer install
